@@ -1,4 +1,5 @@
 import os
+from detectors.regex_detectors import RegexDetector
 
 IGNORED_DIRS = {".git", '.idea', '__pycache__', '.venv', 'venv'}
 IGNORED_EXTENSIONS = {
@@ -11,6 +12,9 @@ IGNORED_EXTENSIONS = {
 def scan_directory(path: str):
     print(f'Scanning directory: {path}')
     findings = []
+
+    detector = RegexDetector()
+
     for root, dirs, filenames in os.walk(path):
         dirs[:] = [d for d in dirs if d not in IGNORED_DIRS]
 
@@ -23,12 +27,17 @@ def scan_directory(path: str):
             try:
                 with open(full_path, encoding='utf-8', errors='ignore') as f:
                     for line_number, line in enumerate(f, start=1):
-                        if 'password' in line.lower():
-                            findings.append({
-                                'file': full_path,
-                                'line': line_number,
-                                'content': line.strip()
-                            })
+
+                        matches = detector.detect(line)
+
+                        if matches:
+                            for match in matches:
+                                findings.append({
+                                    'file': full_path,
+                                    'line': line_number,
+                                    'type': match['type'],
+                                    'value': match['value']
+                                })
             except OSError:
                 continue
     return findings
