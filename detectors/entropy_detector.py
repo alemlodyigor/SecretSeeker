@@ -21,7 +21,8 @@ class EntropyDetector(BaseDetector):
                 if entropy >= self.threshold:
                     results.append({
                         'type': 'High entropy',
-                        'word': word,
+                        'value': word,
+                        'line': line,
                         'entropy': round(entropy, 2)
                     })
         return results
