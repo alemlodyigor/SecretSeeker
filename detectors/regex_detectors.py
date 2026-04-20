@@ -17,6 +17,7 @@ class RegexDetector(BaseDetector):
                 for match in matches:
                     findings.append({
                         'type': name,
-                        'value': match
+                        'value': match,
+                        'line': line,
                     })
         return findings
