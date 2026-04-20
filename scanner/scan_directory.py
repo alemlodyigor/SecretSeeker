@@ -1,4 +1,6 @@
 import os
+
+from detectors.entropy_detector import EntropyDetector
 from detectors.regex_detectors import RegexDetector
 
 IGNORED_DIRS = {".git", '.idea', '__pycache__', '.venv', 'venv'}
@@ -13,7 +15,7 @@ def scan_directory(path: str):
     print(f'Scanning directory: {path}')
     findings = []
 
-    detector = RegexDetector()
+    detectors = [RegexDetector(), EntropyDetector()]
 
     for root, dirs, filenames in os.walk(path):
         dirs[:] = [d for d in dirs if d not in IGNORED_DIRS]
@@ -28,16 +30,17 @@ def scan_directory(path: str):
                 with open(full_path, encoding='utf-8', errors='ignore') as f:
                     for line_number, line in enumerate(f, start=1):
 
-                        matches = detector.detect(line)
-
-                        if matches:
-                            for match in matches:
-                                findings.append({
-                                    'file': full_path,
-                                    'line': line_number,
-                                    'type': match['type'],
-                                    'value': match['value']
-                                })
+                        for detector in detectors:
+                            matches = detector.detect(line)
+                            if matches:
+                                for match in matches:
+                                    findings.append({
+                                        'file': full_path,
+                                        'line': line_number,
+                                        'type': match['type'],
+                                        'value': match['value'],
+                                        'detector': detector.__class__.__name__
+                                    })
             except OSError:
                 continue
     return findings
