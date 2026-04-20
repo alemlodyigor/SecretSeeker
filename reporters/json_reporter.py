@@ -1,0 +1,22 @@
+import datetime
+def json_reporter(findings):
+    findings_len = len(findings)
+    date = datetime.datetime.now()
+    report = {
+        'summary': {
+            'total_findings': findings_len,
+            'scan_date': date.isoformat(),
+        },
+        'results': []
+    }
+
+    for finding in findings:
+        report['results'].append({
+            'file': finding['file'],
+            'line': finding['line'],
+            'detector': finding['detector'],
+            'type': finding['type'],
+            'value': finding['value']
+        })
+
+    return report
