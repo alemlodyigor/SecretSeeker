@@ -11,12 +11,17 @@ def json_reporter(findings):
     }
 
     for finding in findings:
-        report['results'].append({
+        result = {
             'file': finding['file'],
             'line': finding['line'],
             'detector': finding['detector'],
             'type': finding['type'],
             'value': finding['value']
-        })
+        }
+
+        if 'entropy' in finding:
+            result['entropy'] = finding['entropy']
+
+        report['results'].append(result)
 
     return report
