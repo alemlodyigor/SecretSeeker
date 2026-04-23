@@ -34,13 +34,18 @@ def scan_directory(path: str):
                             matches = detector.detect(line)
                             if matches:
                                 for match in matches:
-                                    findings.append({
+                                    finding ={
                                         'file': full_path,
                                         'line': line_number,
                                         'type': match['type'],
                                         'value': match['value'],
                                         'detector': detector.__class__.__name__
-                                    })
+                                    }
+
+                                    if 'entropy' in match:
+                                        finding['entropy'] = match['entropy']
+
+                                    findings.append(finding)
             except OSError:
                 continue
     return findings
